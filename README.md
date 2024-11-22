@@ -20,7 +20,7 @@
 * huggingface上可以直接用的模型，微调也比较方便 https://huggingface.co/flaviagiammarino/medsam-vit-base   https://huggingface.co/wanglab/medsam-vit-base
 
 ## To-DO list
-* 数据预处理，对于不同数据集处理到同样的格式
+* 数据预处理，对于不同数据集处理到同样的格式  目前遇到的问题：预处理速度非常之慢
 * 训练微调代码
 * 如何在服务器上训练
 * 测试模型的精度，不同的评估办法
