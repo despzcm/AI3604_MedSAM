@@ -15,6 +15,7 @@
 ## Accuracy of SAM
 * 论文：https://arxiv.org/pdf/2304.09324v1 里面也包括了一些数据集
 * 同时也可以作为作图的参考
+* https://arxiv.org/pdf/2304.12306v1 这篇有比较多的数据对比，以及具体的评估方法，但是没有代码
 
 ## model usage
 * huggingface上可以直接用的模型，微调也比较方便 https://huggingface.co/flaviagiammarino/medsam-vit-base   https://huggingface.co/wanglab/medsam-vit-base
