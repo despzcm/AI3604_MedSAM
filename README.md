@@ -1,4 +1,4 @@
-# Medical-sam ![Static Badge](https://img.shields.io/badge/Python-green)
+# Medical-sam ![Static Badge](https://img.shields.io/badge/Python-blue)
 
 
 ## dataset
