@@ -11,6 +11,7 @@
 * brain-tumor-mri： https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset
 * https://blog.csdn.net/qq_40714949/article/details/125979508 Polyp Segmentation所划分好的训练集与测试集
 * The ISIC 2020 Challenge Dataset：https://challenge2020.isic-archive.com/
+* https://jbox.sjtu.edu.cn/l/x1lUuz  demo dataset
 
 
 ## Accuracy of SAM
