@@ -1,4 +1,5 @@
-# Medical-sam
+# Medical-sam ![Static Badge](https://img.shields.io/badge/Python-green)
+
 
 ## dataset
 * MICCAI FLARE22 Challenge Dataset        MICCAI FLARE 2023        https://github.com/JunMa11/FLARE
