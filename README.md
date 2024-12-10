@@ -27,3 +27,6 @@
 * 训练微调代码
 * 如何在服务器上训练
 * 测试模型的精度，不同的评估办法
+
+## EVAL result
+* https://www.yuque.com/g/mchongz/uqt5x1/uuqpsa4coh8k64t1/collaborator/join?token=epag6HXWj7VcNznj&source=doc_collaborator# 邀请你共同编辑文档《SAM_eval》
