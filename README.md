@@ -12,7 +12,7 @@
 * https://blog.csdn.net/qq_40714949/article/details/125979508 Polyp Segmentation所划分好的训练集与测试集
 * The ISIC 2020 Challenge Dataset：https://challenge2020.isic-archive.com/
 * https://jbox.sjtu.edu.cn/l/x1lUuz  demo dataset
-* https://github.com/gregoryperkins/MTL-SegTHOR?tab=readme-ov-file SegTHOR dataset.疑似能用 nii
+* https://github.com/gregoryperkins/MTL-SegTHOR?tab=readme-ov-file SegTHOR dataset.疑似能用 .nii, data and the process code: https://jbox.sjtu.edu.cn/l/L1Kwd8
 
 
 ## Accuracy of SAM
