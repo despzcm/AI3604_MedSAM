@@ -31,3 +31,6 @@
 
 ## EVAL result
 * https://www.yuque.com/g/mchongz/uqt5x1/uuqpsa4coh8k64t1/collaborator/join?token=epag6HXWj7VcNznj&source=doc_collaborator# 邀请你共同编辑文档《SAM_eval》
+
+## PPT编辑链接
+* https://www.canva.cn/design/DAGZt1-HLNw/befj1sgYQAGXAwBDKjsiZQ/edit?utm_content=DAGZt1-HLNw&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
