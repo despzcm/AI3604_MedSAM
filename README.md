@@ -1,5 +1,30 @@
 # Medical-sam ![Static Badge](https://img.shields.io/badge/Python-blue)
 
+## Data Process
+`npy_img_dataset.py` our new data class
+
+`flare22_process.py` process Flare22 dataset
+
+`SegTHOR_process.py` process SegTHOR dataset
+
+## Model Train
+`finetune_lora_medsam.py` use lora to finetune medsam
+
+`finetune_lora_SAM.py` use lora to finetune sam
+
+`adapter_medsam.py` use adapter to finetune medsam
+
+`adapter_SAM.py` use adapter to finetune sam
+
+## Model Eval
+main file: model_eval.py
+```
+python model_eval.py    --data_path $YOUR_DATASET_PATH\
+                        --sam_model_path $YOUR_SAM_MODEL_PATH\
+                        --medsam_model_path $YOUR_MedSAM_MODEL_PATH\
+                        --ckp_path $YOUR_CHECKPOINT_PATH\
+                   
+```
 
 ## dataset
 * MICCAI FLARE22 Challenge Dataset        MICCAI FLARE 2023        https://github.com/JunMa11/FLARE
