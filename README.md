@@ -51,11 +51,5 @@ python model_eval.py    --data_path $YOUR_DATASET_PATH\
 ## To-DO list
 * 数据预处理，对于不同数据集处理到同样的格式  目前遇到的问题：预处理速度非常之慢
 * 训练微调代码
-* 如何在服务器上训练
 * 测试模型的精度，不同的评估办法
 
-## EVAL result
-* https://www.yuque.com/g/mchongz/uqt5x1/uuqpsa4coh8k64t1/collaborator/join?token=epag6HXWj7VcNznj&source=doc_collaborator# 邀请你共同编辑文档《SAM_eval》
-
-## PPT编辑链接
-* https://www.canva.cn/design/DAGZt1-HLNw/befj1sgYQAGXAwBDKjsiZQ/edit?utm_content=DAGZt1-HLNw&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
