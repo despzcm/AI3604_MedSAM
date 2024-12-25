@@ -1,0 +1,241 @@
+from peft import LoraConfig, get_peft_model, IA3Config, BOFTConfig
+from peft import PeftConfig
+from torch.utils.data import Dataset, DataLoader
+import SimpleITK as sitk
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+import argparse
+import random
+from datetime import datetime
+import shutil
+from segment_anything import sam_model_registry
+import glob
+import monai
+import torch
+import torch.nn as nn
+from tqdm import tqdm
+# from train_one_gpu import MedSAM
+from torch.optim import AdamW
+import torch.nn.functional as F
+
+# Define LoRA configuration
+lora_config = LoraConfig(
+    r=8,  # Rank of low-rank adapters (you can experiment with this)
+    lora_alpha=16,  # Scaling factor
+    lora_dropout=0.1,  # Dropout to regularize LoRA layers
+    bias="none",  # Bias handling in LoRA layers (can be 'none', 'all', 'lora', etc.)
+    target_modules=["q_proj", "v_proj"]  # Specify which layers to apply LoRA to (for example)
+)
+ia_config = IA3Config(
+    target_modules=["k_proj", "v_proj", "down_proj"], 
+    feedforward_modules=["down_proj"]
+)
+
+boft_config = BOFTConfig(
+    boft_block_size=4,
+    boft_n_butterfly_factor=2,
+    target_modules=["mask_decoder.output_hypernetworks_mlps.0.layers.2",
+                    "mask_decoder.output_hypernetworks_mlps.1.layers.2",
+                    "mask_decoder.output_hypernetworks_mlps.2.layers.2",
+                    "mask_decoder.output_hypernetworks_mlps.3.layers.2",
+                    "mask_decoder.transformer.layers.1.mlp.lin1",
+                    "mask_decoder.transformer.layers.1.mlp.lin2",
+                    "mask_decoder.transformer.layers.0.mlp.lin1",
+                    "mask_decoder.transformer.layers.0.mlp.lin2"],
+    boft_dropout=0.1,
+    bias="boft_only",
+    modules_to_save=["classifier"],
+)
+class MedSAM(nn.Module):
+    def __init__(
+        self,
+        image_encoder,
+        mask_decoder,
+        prompt_encoder,
+    ):
+        super().__init__()
+        self.image_encoder = image_encoder
+        self.mask_decoder = mask_decoder
+        self.prompt_encoder = prompt_encoder
+        # freeze prompt encoder
+        for param in self.prompt_encoder.parameters():
+            param.requires_grad = False
+
+    def forward(self, image, box):
+        image_embedding = self.image_encoder(image)  # (B, 256, 64, 64)
+        # do not compute gradients for prompt encoder
+        with torch.no_grad():
+            box_torch = torch.as_tensor(box, dtype=torch.float32, device=image.device)
+            if len(box_torch.shape) == 2:
+                box_torch = box_torch[:, None, :]  # (B, 1, 4)
+
+            sparse_embeddings, dense_embeddings = self.prompt_encoder(
+                points=None,
+                boxes=box_torch,
+                masks=None,
+            )
+        low_res_masks, _ = self.mask_decoder(
+            image_embeddings=image_embedding,  # (B, 256, 64, 64)
+            image_pe=self.prompt_encoder.get_dense_pe(),  # (1, 256, 64, 64)
+            sparse_prompt_embeddings=sparse_embeddings,  # (B, 2, 256)
+            dense_prompt_embeddings=dense_embeddings,  # (B, 256, 64, 64)
+            multimask_output=False,
+        )
+        ori_res_masks = F.interpolate(
+            low_res_masks,
+            size=(image.shape[2], image.shape[3]),
+            mode="bilinear",
+            align_corners=False,
+        )
+        return ori_res_masks
+
+
+device = "cuda:1"
+sam_model = sam_model_registry["vit_b"](checkpoint="./model/checkpoint/sam_vit_b_01ec64.pth")
+MedSAM_CKPT_PATH = "./model/checkpoint/medsam_vit_b.pth"
+npy_dir = "./data/npy/CT_Abd"
+num_epochs = 1
+learning_rate = 2e-5
+set_num_workers = 32
+set_batch_size = 4
+
+
+# Apply LoRA adapters to the Med-SAM model
+medsam_model = MedSAM(
+    image_encoder=sam_model.image_encoder,
+    mask_decoder=sam_model.mask_decoder,
+    prompt_encoder=sam_model.prompt_encoder,
+).to(device)
+
+
+checkpoint = torch.load(MedSAM_CKPT_PATH, map_location=device)
+medsam_model.load_state_dict(checkpoint)
+
+#for name, module in medsam_model.named_modules():
+    #print(name)
+
+
+model = get_peft_model(medsam_model, boft_config)
+# Define loss function
+seg_loss = monai.losses.DiceLoss(sigmoid=True, squared_pred=True, reduction="mean")
+ce_loss = nn.BCEWithLogitsLoss(reduction="mean")
+optimizer = AdamW(model.parameters(), lr=learning_rate)
+
+class NpyDataset(Dataset):
+    def __init__(self, data_root, bbox_shift=20):
+        self.data_root = data_root
+        self.gt_path = os.path.join(data_root, "gts")
+        self.img_path = os.path.join(data_root, "imgs")
+        self.gt_path_files = sorted(
+            glob.glob(os.path.join(self.gt_path, "**/*.npy"), recursive=True)
+        )
+        self.gt_path_files = [
+            file
+            for file in self.gt_path_files
+            if os.path.isfile(os.path.join(self.img_path, os.path.basename(file)))
+        ]
+        self.bbox_shift = bbox_shift
+        print(f"number of images: {len(self.gt_path_files)}")
+
+    def __len__(self):
+        return len(self.gt_path_files)
+
+    def __getitem__(self, index):
+        # load npy image (1024, 1024, 3), [0,1]
+        img_name = os.path.basename(self.gt_path_files[index])
+        img_1024 = np.load(
+            os.path.join(self.img_path, img_name), "r", allow_pickle=True
+        )  # (1024, 1024, 3)
+        # convert the shape to (3, H, W)
+        img_1024 = np.transpose(img_1024, (2, 0, 1))
+        assert (
+            np.max(img_1024) <= 1.0 and np.min(img_1024) >= 0.0
+        ), "image should be normalized to [0, 1]"
+        gt = np.load(
+            self.gt_path_files[index], "r", allow_pickle=True
+        )  # multiple labels [0, 1,4,5...], (256,256)
+        assert img_name == os.path.basename(self.gt_path_files[index]), (
+            "img gt name error" + self.gt_path_files[index] + self.npy_files[index]
+        )
+        label_ids = np.unique(gt)[1:]
+        gt2D = np.uint8(
+            gt == random.choice(label_ids.tolist())
+        )  # only one label, (256, 256)
+        assert np.max(gt2D) == 1 and np.min(gt2D) == 0.0, "ground truth should be 0, 1"
+        y_indices, x_indices = np.where(gt2D > 0)
+        x_min, x_max = np.min(x_indices), np.max(x_indices)
+        y_min, y_max = np.min(y_indices), np.max(y_indices)
+        # add perturbation to bounding box coordinates
+        H, W = gt2D.shape
+        x_min = max(0, x_min - random.randint(0, self.bbox_shift))
+        x_max = min(W, x_max + random.randint(0, self.bbox_shift))
+        y_min = max(0, y_min - random.randint(0, self.bbox_shift))
+        y_max = min(H, y_max + random.randint(0, self.bbox_shift))
+        bboxes = np.array([x_min, y_min, x_max, y_max])
+        return (
+            torch.tensor(img_1024).float(),
+            torch.tensor(gt2D[None, :, :]).long(),
+            torch.tensor(bboxes).float(),
+            img_name,
+        )
+
+# Example dataset loading (adjust paths accordingly)
+train_dataset = NpyDataset(npy_dir)
+train_dataloader = DataLoader(
+    train_dataset,
+    batch_size=set_batch_size,
+    shuffle=True,
+    num_workers=set_num_workers,
+    pin_memory=True,
+)
+
+# Define the training loop
+def train_epoch(model, data_loader, optimizer):
+    model.train()
+    total_loss = 0
+    for step, (image, gt2D, boxes, _) in enumerate(tqdm(data_loader)):
+        optimizer.zero_grad()
+        boxes_np = boxes.detach().cpu().numpy()
+        image, gt2D = image.to(device), gt2D.to(device)
+        # Forward pass
+        medsam_pred = model(image, boxes_np)
+        loss = seg_loss(medsam_pred, gt2D) + ce_loss(medsam_pred, gt2D.float())
+         
+        # Backpropagation
+        loss.backward()
+        optimizer.step()
+
+        total_loss += loss.item()
+    return total_loss / len(data_loader)
+
+def test_original(model, dataloader):
+    print("original test")
+    total_loss = 0
+    for step, (image, gt2D, boxes, _) in enumerate(tqdm(dataloader)):
+        boxes_np = boxes.detach().cpu().numpy()
+        image, gt2D = image.to(device), gt2D.to(device)
+        # Forward pass
+        medsam_pred = model(image, boxes_np)
+        loss = seg_loss(medsam_pred, gt2D) + ce_loss(medsam_pred, gt2D.float())
+        total_loss += loss.item()
+    return total_loss / len(dataloader)
+
+
+
+#original_model_loss = test_original(medsam_model,train_dataloader)
+#print("original loss", original_model_loss)
+
+for epoch in range(num_epochs):
+    epoch_loss = train_epoch(model, train_dataloader, optimizer)
+    print(f"Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss}")
+    
+checkpoint = {
+    "model": model.state_dict(),
+    "optimizer": optimizer.state_dict(),
+    "epoch": epoch+1,
+}
+torch.save(checkpoint, "./model/checkpoint/finetune_medsam_adapter_epoch"+ str(epoch+1)+".pth")
+
+
+
