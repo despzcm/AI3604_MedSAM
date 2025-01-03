@@ -1,5 +1,10 @@
 # Medical-sam ![Static Badge](https://img.shields.io/badge/Python-blue)
+## Introduction
+Image segmentation, a key challenge in computer vision, involves dividing an image into distinct, non-overlapping regions based on features like color, texture, and shape. It is crucial for image analysis and understanding, separating the target object from the background. Since the 1990s, segmentation has received significant research attention, with deep learning advancements, especially models like Segment Anything Model (SAM), driving substantial progress in this area.
 
+In this project, we implement medical image segmentation using the `SAM` model and 
+fine-tune SAM using efficient fine-tuning techniques (e.g., `LoRA`, `Adapters`) to fit the specific 
+requirements of the medical imaging dataset. 
 ## Data Process
 `npy_img_dataset.py` our new data class
 
@@ -48,8 +53,5 @@ python model_eval.py    --data_path $YOUR_DATASET_PATH\
 ## model usage
 * huggingface上可以直接用的模型，微调也比较方便 https://huggingface.co/flaviagiammarino/medsam-vit-base   https://huggingface.co/wanglab/medsam-vit-base
 
-## To-DO list
-* 数据预处理，对于不同数据集处理到同样的格式  目前遇到的问题：预处理速度非常之慢
-* 训练微调代码
-* 测试模型的精度，不同的评估办法
+
 
