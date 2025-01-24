@@ -1,8 +1,8 @@
 # Medical-sam ![Static Badge](https://img.shields.io/badge/Python-blue)
 ## Introduction
-Image segmentation, a key challenge in computer vision, involves dividing an image into distinct, non-overlapping regions based on features like color, texture, and shape. It is crucial for image analysis and understanding, separating the target object from the background. Since the 1990s, segmentation has received significant research attention, with deep learning advancements, especially models like Segment Anything Model (SAM), driving substantial progress in this area.
+> Image segmentation, a key challenge in computer vision, involves dividing an image into distinct, non-overlapping regions based on features like color, texture, and shape. It is crucial for image analysis and understanding, separating the target object from the background. Since the 1990s, segmentation has received significant research attention, with deep learning advancements, especially models like Segment Anything Model (SAM), driving substantial progress in this area.
 
-In this project, we implement medical image segmentation using the `SAM` model and 
+> In this project, we implement medical image segmentation using the `SAM` model and 
 fine-tune SAM using efficient fine-tuning techniques (e.g., `LoRA`, `Adapters`) to fit the specific 
 requirements of the medical imaging dataset. 
 ## Data Process
