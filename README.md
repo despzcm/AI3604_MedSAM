@@ -4,7 +4,11 @@
 
 > In this project, we implement medical image segmentation using the `SAM` model and 
 fine-tune SAM using efficient fine-tuning techniques (e.g., `LoRA`, `Adapters`) to fit the specific 
-requirements of the medical imaging dataset. 
+requirements of the medical imaging dataset.
+
+## Sample Results
+![Sample](/stacked.png)
+
 ## Data Process
 `npy_img_dataset.py` our new data class
 
