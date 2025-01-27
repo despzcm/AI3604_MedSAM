@@ -10,7 +10,7 @@ requirements of the medical imaging dataset.
 ![Sample](/stacked.png)
 
 ## Inference
-main file: model_eval.py
+main file: `model_eval.py`
 ```
 python model_eval.py    --data_path $YOUR_DATASET_PATH\
                         --sam_model_path $YOUR_SAM_MODEL_PATH\
@@ -19,7 +19,9 @@ python model_eval.py    --data_path $YOUR_DATASET_PATH\
                    
 ```
 
-## Data Process
+## Dataset and Data Process
+> For the training dataset, we primarily use 80\% of the labeled FLARE22 dataset, which consists of approximately 3,600 images after preprocessing. For evaluation, we employ three distinct datasets. These include FLARE22, a large-scale and diverse abdomen CT dataset from over 20 medical institutions, with the remaining labeled data used for evaluation; the ETIS-Larib Polyp DB, a database containing frames extracted from colonoscopy videos, with 192 labeled polyp images; and SegTHOR, a CT dataset specifically designed for the segmentation of thoracic organs at risk (OARs), where we use 400 labeled images for testing.
+
 `npy_img_dataset.py` our new data class
 
 `flare22_process.py` process [Flare22 dataset](https://flare22.grand-challenge.org/Dataset/)
