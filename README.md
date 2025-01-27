@@ -19,6 +19,16 @@ python model_eval.py    --data_path $YOUR_DATASET_PATH\
                    
 ```
 
+## Our model
+[model link](https://jbox.sjtu.edu.cn/l/tH1JU0)
+
+* `medsam_base` MedSAM base model
+* `medsam_lora` MedSAM finetune use lora
+* `medsam_boft` MedSAM finetune use boft
+* `sam_base` SAM base model
+* `sam_lora` SAM finetune use lora
+* `sam_boft` SAM finetune use boft
+
 ## Dataset and Data Process
 > For the training dataset, we primarily use 80\% of the labeled `FLARE22 dataset`, which consists of approximately 3,600 images after preprocessing. For evaluation, we employ three distinct datasets. These include `FLARE22`, a large-scale and diverse abdomen CT dataset from over 20 medical institutions, with the remaining labeled data used for evaluation; the `ETIS-Larib Polyp DB`, a database containing frames extracted from colonoscopy videos, with 192 labeled polyp images; and `SegTHOR`, a CT dataset specifically designed for the segmentation of thoracic organs at risk (OARs), where we use 400 labeled images for testing.
 
