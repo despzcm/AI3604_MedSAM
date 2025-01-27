@@ -28,6 +28,8 @@ python model_eval.py    --data_path $YOUR_DATASET_PATH\
 
 `SegTHOR_process.py` process [SegTHOR dataset](https://competitions.codalab.org/competitions/21145)
 
+Part of dataset we use: [Link](https://jbox.sjtu.edu.cn/l/x1lUuz)
+
 ## Model Train
 `finetune_lora_medsam.py` use lora to finetune medsam
 
@@ -39,18 +41,17 @@ python model_eval.py    --data_path $YOUR_DATASET_PATH\
 
 
 
-## dataset
+## More Datasets
 * MICCAI FLARE22 Challenge Dataset        MICCAI FLARE 2023        https://github.com/JunMa11/FLARE
 * MPLiTS
 * MPCT-FLLs
-* 包含一切的数据集：https://github.com/linhandev/dataset 但是问题在于比较老
-* 一些可能不是医学的数据集： https://github.com/tianrun-chen/SAM-Adapter-PyTorch 链接中的dataset
+* https://github.com/linhandev/dataset
 * saros：https://www.cancerimagingarchive.net/analysis-result/saros/
 * brain-tumor-mri： https://www.kaggle.com/datasets/masoudnickparvar/brain-tumor-mri-dataset
-* https://blog.csdn.net/qq_40714949/article/details/125979508 Polyp Segmentation所划分好的训练集与测试集
+* https://blog.csdn.net/qq_40714949/article/details/125979508 Polyp Segmentation
 * The ISIC 2020 Challenge Dataset：https://challenge2020.isic-archive.com/
-* https://jbox.sjtu.edu.cn/l/x1lUuz  demo dataset
-* https://github.com/gregoryperkins/MTL-SegTHOR?tab=readme-ov-file SegTHOR dataset.疑似能用 .nii, data and the process code: https://jbox.sjtu.edu.cn/l/L1Kwd8
+
+
 
 
 
