@@ -9,7 +9,7 @@ requirements of the medical imaging dataset.
 ## 🫀Sample Results
 ![Sample](/stacked.png)
 
-## 🚀Inference
+## 🚀Evaluate
 main file: `model_eval.py`
 ```
 python model_eval.py    --data_path $YOUR_DATASET_PATH\
